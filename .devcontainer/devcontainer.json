@@ -28,6 +28,7 @@
 			"extensions": [
 				"davidanson.vscode-markdownlint",
 				"github.copilot-chat",
+				"golang.go",
 				"ms-azuretools.vscode-azure-github-copilot",
 				"mutantdino.resourcemonitor",
 				"yzhang.markdown-all-in-one"
