@@ -2,67 +2,109 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
 func main() {
-  // var name string = "Dent, Arthur"
-  // name := "Dent, Arthur"
 
-  // var score = 87
-  // score := 87
+	type score struct {
+		name  string
+		score int
+	}
 
-  // name, score := "Dent, Arthur", 87
+	scores := []score{}
+  shouldContinue := true
 
-  // students := []string{"Dent, Arthur",
-  //   "MacMillan, Tricia",
-  //   "Ford, Prefect",
-  // }
-  // scores := []int{87, 96, 64}
-  // scores := map[string]int{
-  //   students[0]: 87,
-  //   students[1]: 96,
-  //   students[2]: 64,
-  // }
+	for shouldContinue {
 
-  type score struct {
-    name  string
-    score int
-  }
+    fmt.Println("1) Enter a score")
+    fmt.Println("2) Print report")
+    fmt.Println("q) Quit")
+    fmt.Println()
+    fmt.Println("Select an option")
 
-  scores := []score{
-    {name: "Dent, Arthur", score: 87},
-    {name: "MacMillan, Tricia", score: 96},
-    {name: "Ford, Prefect", score: 64},
-  }
+    var option string
+    fmt.Scanln(&option)
 
-  fmt.Println("Select score to print (1 - 3):")
-  var option string
-  fmt.Scanln(&option)
-
-  fmt.Println("Student scores")
-  fmt.Println(strings.Repeat("-", 14))
-  var index int
-  // if option == "1" { // should use strconv package in production!
-  //   index = 0
-  // } else if option == "2" {
-  //   index = 1
-  // } else if option == "3" {
-  //   index = 2
-  // } else {
-  //   fmt.Println("Unknown option, defaulting to 1")
-  //   index = 0
-  // }
-  switch option {
-  case "1":
-    index = 0
-  case "2":
-    index = 1
-  case "3":
-    index = 2
-  default:
-    fmt.Println("Unknown option, defaulting to 1")
-    index = 0
-  }
-  fmt.Println(scores[index].name, scores[index].score)
+    switch option {
+    case "1":
+      fmt.Println("Enter a student name and score")
+      var name, rawScore string
+      fmt.Scanln(&name, &rawScore)
+      s, _ := strconv.Atoi(rawScore) // https://pkg.go.dev/strconv#Atoi
+      scores = append(scores, score{name: name, score: s})
+    case "2":
+      fmt.Println("Student scores")
+      fmt.Println(strings.Repeat("-", 14))
+      // fmt.Println(scores)
+      for _, s := range scores {
+        fmt.Println(s.name, s.score)
+      }
+    case "q":
+      shouldContinue = false
+    }
+	}
 }
+
+// func main() {
+// 	// var name string = "Dent, Arthur"
+// 	// name := "Dent, Arthur"
+
+// 	// var score = 87
+// 	// score := 87
+
+// 	// name, score := "Dent, Arthur", 87
+
+// 	// students := []string{"Dent, Arthur",
+// 	//   "MacMillan, Tricia",
+// 	//   "Ford, Prefect",
+// 	// }
+// 	// scores := []int{87, 96, 64}
+// 	// scores := map[string]int{
+// 	//   students[0]: 87,
+// 	//   students[1]: 96,
+// 	//   students[2]: 64,
+// 	// }
+
+// 	type score struct {
+// 		name  string
+// 		score int
+// 	}
+
+// 	scores := []score{
+// 		{name: "Dent, Arthur", score: 87},
+// 		{name: "MacMillan, Tricia", score: 96},
+// 		{name: "Ford, Prefect", score: 64},
+// 	}
+
+// 	fmt.Println("Select score to print (1 - 3):")
+// 	var option string
+// 	fmt.Scanln(&option)
+
+// 	fmt.Println("Student scores")
+// 	fmt.Println(strings.Repeat("-", 14))
+// 	var index int
+// 	// if option == "1" { // should use strconv package in production!
+// 	//   index = 0
+// 	// } else if option == "2" {
+// 	//   index = 1
+// 	// } else if option == "3" {
+// 	//   index = 2
+// 	// } else {
+// 	//   fmt.Println("Unknown option, defaulting to 1")
+// 	//   index = 0
+// 	// }
+// 	switch option {
+// 	case "1":
+// 		index = 0
+// 	case "2":
+// 		index = 1
+// 	case "3":
+// 		index = 2
+// 	default:
+// 		fmt.Println("Unknown option, defaulting to 1")
+// 		index = 0
+// 	}
+// 	fmt.Println(scores[index].name, scores[index].score)
+// }
