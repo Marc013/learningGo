@@ -60,8 +60,8 @@ RUN mkdir -p ${GOPATH} && chown -R vscode:vscode ${GOPATH}
 USER vscode
 
 RUN go install golang.org/x/tools/gopls@v0.22.0 && \
-    go install github.com/go-delve/delve/cmd/dlv@v1.27.0&& \
-    go install github.com/josharian/impl@latest && \
+    go install github.com/go-delve/delve/cmd/dlv@v1.27.0 && \
+    go install github.com/josharian/impl@v1.4.0 && \
     go install github.com/haya14busa/goplay/cmd/goplay@v1.0.0
 
 RUN curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b "$(go env GOBIN)" v2.12.2
