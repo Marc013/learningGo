@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	// Step 3,4 - Import
-	"sync"
 	"time"
 )
 
