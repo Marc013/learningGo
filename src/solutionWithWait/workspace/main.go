@@ -11,7 +11,9 @@ import (
 func main() {
 	startTime := time.Now() // Record the current time
 	var totalSales int
+		// Mutex to synchronize access to totalSales
     var mu sync.Mutex
+		// Define wait group
     var wg sync.WaitGroup
     wg.Add(len(salesData))
 
