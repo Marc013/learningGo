@@ -11,26 +11,40 @@ func main() {
 	var totalSales int
     // Creates an unbuffered channel of type int
     salesCh := make(chan int)
+    // Create a channel for error communication
+    errorCh := make(chan error)
 
 	for _, salesRegion := range salesData {
 		// Invoke to calculate Total for Each Region
-		go calculateRegionSales(salesRegion, salesCh)
+		go calculateRegionSales(salesRegion, salesCh, errorCh)
 	}
 
     // Allow goroutines to complete
     // Receive total sales from each goroutine asynchronously
     for i := 0; i < len(salesData); i++ {
-      totalSales += <- salesCh
+      select {
+       case total := <-salesCh:
+        totalSales += total
+       case err := <-errorCh:
+        fmt.Printf("Error: %v\n", err)
+       case <-time.After(3000 * time.Millisecond):
+        fmt.Println("Timeout occurred while waiting for sales data")
+        return
+       }
     }
 
 	fmt.Printf("Total %d , Time taken to calculate %s \n", totalSales, time.Since(startTime))
 }
 
 // Function to Calculate Total Sales per Region
-func calculateRegionSales(salesRegion []int, salesCh chan <- int) {
+func calculateRegionSales(salesRegion []int, salesCh chan<- int, errorCh chan<- error) {
 	regionTotal := 0
 	for _, storeSales := range salesRegion {
 		// Calculate region total
+        if storeSales < 0 {
+          errorCh <- fmt.Errorf("SKIPPED REGION! Found store with sale value [%d] less than 0. Please recheck data for region", storeSales)
+          return
+        }
 		regionTotal += storeSales
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -40,54 +54,36 @@ func calculateRegionSales(salesRegion []int, salesCh chan <- int) {
 }
 
 
-/* ---- Channel Direction ----
-You can specify the direction of a channel in its type signature to restrict
-its usage to sending or receiving operations. This helps enforce
-communication protocols and prevent misuse of channels. Here's how you
-specify channel direction:
+/* ---- example of error propagation using channels ----
+// Create a channel for error communication
+errCh := make(chan error)
 
-func sendData(ch chan<- int) {
-  // Send data into channel
-}
-
-func receiveData(ch <-chan int) {
-  // Receive data from channel
-}
-*/
-
-/* ---- A simple example of using channel direction in Go ----
-
-func sendData(ch chan<- int) {
- // Send data into the channel
- ch <- 10
- ch <- 20
- ch <- 30
- close(ch) // Close the channel after sending all values
+func doTask(resultCh chan int, errCh chan error) {
+ resultCh <- 42              // Simulate a calculation
+ errCh <- errors.New("something went wrong") // Simulate an error
 }
 
 func main() {
- // Create an unbuffered channel of type int
- ch := make(chan int)
+ resultCh := make(chan int)  // Channel for result
+ errCh := make(chan error)   // Channel for error
 
- // Start a goroutine to send data into the channel
- go sendData(ch)
+go doTask(resultCh, errCh)  // Start the task goroutine
 
- // Receive data from the channel
- for {
-   // Attempt to receive a value from the channel
-   value, ok := <-ch
-   if !ok {
-   // Channel closed, exit the loop
-   break
-  }
-  // Print the received value
-  fmt.Println("Received:", value)
+ select {
+  case result := <-resultCh:
+   fmt.Println("Result:", result)
+  case err := <-errCh:
+   fmt.Println("Error:", err)
   }
 }
 */
 
-/* ---- Output ----
-Received: 10
-Received: 20
-Received: 30
+
+/*
+In this example:
+
+The `doTask` function sends the result, `42`, and an error, `("something went wrong")`, directly to their respective channels.
+Channels for both the result and the error communication are created.
+The `main` function starts the task goroutine using `go doTask(resultCh, errCh)`.
+The select statement handles either receiving the result or the error from their respective channels and prints them accordingly.
 */
