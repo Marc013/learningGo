@@ -1,0 +1,8 @@
+go get github.com/pioz/faker@v0.1.1
+go get github.com/pioz/faker@v1.6.0
+go get github.com/pioz/faker@latest
+
+ls C:\Users\pinal\go\pkg\mod\github.com\pioz
+
+go get -u
+go mod tidy

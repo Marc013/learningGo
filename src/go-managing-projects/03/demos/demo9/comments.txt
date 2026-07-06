@@ -1,0 +1,16 @@
+go clean -modcache
+go run .
+
+go clean -modcache
+Disconnect internet
+go run .
+
+
+Connect internet
+go run .
+go mod vendor -v
+
+
+go clean -modcache
+Disconnect internet
+go run .

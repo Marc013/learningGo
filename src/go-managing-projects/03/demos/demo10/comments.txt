@@ -1,0 +1,16 @@
+//run in gopath
+
+go clean -modcache
+go env -w GO111MODULE=off
+go env -w GO111MODULE=on
+
+https://github.com/golang/dep/releases
+
+./dep init
+go run .      
+./dep ensure -add github.com/pioz/faker
+go run . 
+./dep prune
+./dep status 
+./dep check
+./dep prune

@@ -1,0 +1,25 @@
+git config --global user.email "pinaldave@gmail.com"
+git config --global user.name "Pinal Dave"
+
+git init
+git add go.mod go.sum main.go
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/pinaldave/colorsgo.git
+git push -u origin main
+
+git add go.mod go.sum main.go
+git commit -m "second commit"
+git tag v0.1.1
+git push -u origin v0.1.1
+
+git add go.mod go.sum main.go
+git commit -m "third commit"
+git tag v1.1.1
+git push -u origin v1.1.1
+
+git add go.mod go.sum main.go
+git commit -m "third commit"
+git tag v1.1.1
+git push -u origin main
+

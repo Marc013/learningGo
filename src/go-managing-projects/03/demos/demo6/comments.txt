@@ -1,0 +1,4 @@
+
+go install github.com/pioz/faker
+
+go mod why github.com/pioz/faker
