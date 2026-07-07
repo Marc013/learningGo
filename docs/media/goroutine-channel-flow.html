@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Go Goroutines and Channels Explained</title>
+  <style>
+    :root {
+      --ink: #102a43;
+      --muted: #4f6b84;
+      --panel: #ffffff;
+      --line: #d5e3ef;
+      --bg-a: #fef8ee;
+      --bg-b: #ebf6ff;
+      --accent: #d95f1f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1000px 700px at -10% 120%, #dcf7eb 0%, transparent 60%),
+        radial-gradient(1200px 700px at 100% -20%, #f0e8ff 0%, transparent 60%),
+        linear-gradient(145deg, var(--bg-a), var(--bg-b));
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .page {
+      width: 100vw;
+      height: 100dvh;
+      margin: 0;
+      background: var(--panel);
+      border: 0;
+      border-radius: 0;
+      overflow: hidden;
+      box-shadow: none;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .hero {
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, #ffffff 82%, #edf6ff 18%);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-family: "Palatino Linotype", "Book Antiqua", serif;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .diagram-wrap {
+      min-height: 0;
+      border-right: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfdff, #f7fbff);
+      padding: 10px;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .diagram-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border: 1px solid #dbe7f0;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .guide {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    .steps,
+    .examples {
+      min-height: 0;
+      overflow: auto;
+      padding: 14px 16px;
+    }
+
+    .steps {
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-family: "Palatino Linotype", "Book Antiqua", serif;
+      font-size: 1.25rem;
+    }
+
+    ol {
+      margin: 0;
+      padding-left: 22px;
+      line-height: 1.5;
+    }
+
+    li {
+      margin: 0 0 10px;
+    }
+
+    .card {
+      margin: 0 0 14px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #d4e3ef;
+      background: #fbfdff;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .card p {
+      margin: 0;
+      line-height: 1.45;
+      color: #2a4661;
+    }
+
+    .tip {
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      background: #fff7f2;
+      color: #57320f;
+      border-radius: 8px;
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+
+    .timeline {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid #cfe0ee;
+      border-radius: 10px;
+      background: #f8fcff;
+      font-size: 0.92rem;
+      color: #21415e;
+      line-height: 1.4;
+    }
+
+    .timeline h3 {
+      margin: 0 0 6px;
+      font-size: 0.98rem;
+      color: #1b3d5a;
+    }
+
+    .timeline p {
+      margin: 0 0 4px;
+    }
+
+    @media (max-width: 1100px) {
+      h1 {
+        font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+      }
+
+      .subtitle {
+        font-size: 0.92rem;
+      }
+
+      .card h3 {
+        font-size: 0.98rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="hero">
+      <h1>Beginner Guide: Goroutines and Channels in Your Program</h1>
+      <p class="subtitle">This page is designed for learning. The diagram scales to screen width, and the steps below
+        explain exactly what happens in runtime using the same 6 numbered steps as the image.</p>
+    </header>
+
+    <section class="workspace">
+      <section class="diagram-wrap" aria-label="Goroutine and channel flow diagram">
+        <img src="./goroutine-channel-flow.drawio.svg"
+          alt="Large flow diagram showing goroutines, channels, and data routing in main.go">
+      </section>
+
+      <section class="guide">
+        <article class="steps">
+          <h2>Step-by-Step Flow</h2>
+          <ol>
+            <li><strong>Step 1 (blue) - start receiveOrders goroutine</strong>: main launches receiveOrders. No wait yet
+              in main; receiveOrders later blocks when sending on receivedOrdersCh until a receiver is ready.
+            </li>
+            <li><strong>Step 2 (blue) - start validateOrders goroutine</strong>: main launches validateOrders.
+              validateOrders immediately blocks on <code>order := &lt;-in</code> until receiveOrders sends.</li>
+            <li><strong>Step 3 (blue) - send to receivedOrdersCh</strong>: receiveOrders unmarshals first JSON and
+              attempts <code>out &lt;- newOrder</code>. This send blocks until validateOrders is waiting on the matching
+              receive.</li>
+            <li><strong>Step 4 (blue) - validateOrders receives</strong>: the blocked receive in validateOrders is
+              satisfied by step 3. After receive succeeds, validateOrders continues with the quantity check.</li>
+            <li><strong>Step 5 (green) OR Step 6 (pink) - route to output channel</strong>: validateOrders sends to
+              validOrderCh (green) or invalidOrderCh (pink). That send blocks until the corresponding printer goroutine
+              is waiting to receive.</li>
+            <li><strong>Final wake-up pattern</strong>: the matching printer goroutine receives, prints, then calls
+              <code>wg.Done()</code>. main is blocked on <code>wg.Wait()</code> and resumes only after that done signal.
+            </li>
+          </ol>
+
+          <section class="timeline" aria-label="Tiny blocking timeline">
+            <h3>Tiny Blocking Timeline</h3>
+            <p><strong>T1-T2:</strong> validateOrders waits on <code>&lt;-in</code>.</p>
+            <p><strong>T3-T4:</strong> receiveOrders send and validateOrders receive synchronize; both continue.</p>
+            <p><strong>T5-T6:</strong> main waits on <code>wg.Wait()</code> until the chosen printer goroutine receives,
+              prints, and calls <code>wg.Done()</code>.</p>
+          </section>
+        </article>
+
+        <aside class="examples">
+          <h2>Path Outcomes</h2>
+
+          <section class="card">
+            <h3>Current input (first quantity = 5)</h3>
+            <p>Branch taken: <strong>green</strong> (valid). The valid printer receives from validOrderCh, prints, and
+              unblocks main via wg.Done(). The invalid printer remains blocked waiting on invalidOrderCh.</p>
+          </section>
+
+          <section class="card">
+            <h3>If first quantity is changed to -5</h3>
+            <p>Branch taken: <strong>pink</strong> (invalid). The invalid printer receives invalidOrder and prints the
+              error. The valid printer remains blocked waiting on validOrderCh.</p>
+          </section>
+
+          <section class="card">
+            <h3>Why only one order is routed</h3>
+            <p>validateOrders performs one receive and does not loop. So only the first parsed order is validated and
+              routed in this version.</p>
+          </section>
+
+          <div class="tip">
+            Learning tip: think of a channel as a handoff point where one goroutine sends and another receives.
+          </div>
+        </aside>
+      </section>
+    </section>
+  </main>
+</body>
+
+</html>

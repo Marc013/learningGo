@@ -1,0 +1,99 @@
+<mxfile host="Electron" agent="GitHub Copilot">
+  <diagram id="goroutine-flow" name="Goroutine Flow">
+    <mxGraphModel dx="1945" dy="989" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=34;fontStyle=1;fontColor=#0D2D4B;" value="Goroutines and Channels: Exact Runtime Flow" vertex="1">
+          <mxGeometry height="50" width="900" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="main" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#D8EBFF;strokeColor=#5C96CA;strokeWidth=2;fontSize=15;align=left;spacing=12;" value="&lt;b&gt;main() goroutine&lt;/b&gt;&lt;br&gt;Creates 3 channels&lt;br&gt;Starts workers + printer goroutines&lt;br&gt;Waits with WaitGroup" vertex="1">
+          <mxGeometry height="190" width="340" x="40" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="receive" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#DAF8EC;strokeColor=#55AA86;strokeWidth=2;fontSize=15;align=left;spacing=12;" value="&lt;b&gt;receiveOrders(out)&lt;/b&gt;&lt;br&gt;Loop rawOrders&lt;br&gt;json.Unmarshal&lt;br&gt;send valid parse to out" vertex="1">
+          <mxGeometry height="190" width="390" x="420" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="validate" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFEECF;strokeColor=#C89227;strokeWidth=2;fontSize=15;align=left;spacing=12;" value="&lt;b&gt;validateOrders(in,out,errCh)&lt;/b&gt;&lt;br&gt;Reads one order: order := &amp;lt;-in&lt;br&gt;Quantity &amp;gt; 0 =&amp;gt; out&lt;br&gt;else =&amp;gt; errCh&lt;br&gt;No loop: only first order" vertex="1">
+          <mxGeometry height="210" width="430" x="870" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_received" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=18;fillColor=#2F7AB5;strokeColor=#2F7AB5;fontColor=#FFFFFF;fontStyle=1;align=center;verticalAlign=middle;fontSize=15;" value="receivedOrdersCh" vertex="1">
+          <mxGeometry height="46" width="220" x="505" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_valid" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=18;fillColor=#6D58B4;strokeColor=#6D58B4;fontColor=#FFFFFF;fontStyle=1;align=center;verticalAlign=middle;fontSize=15;" value="validOrderCh" vertex="1">
+          <mxGeometry height="46" width="210" x="568" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="ch_invalid" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=18;fillColor=#BD5378;strokeColor=#BD5378;fontColor=#FFFFFF;fontStyle=1;align=center;verticalAlign=middle;fontSize=15;" value="invalidOrderCh" vertex="1">
+          <mxGeometry height="46" width="220" x="975" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="printer_valid" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#EFE6FF;strokeColor=#8B71C7;strokeWidth=2;fontSize=15;align=left;spacing=12;" value="&lt;b&gt;valid printer goroutine&lt;/b&gt;&lt;br&gt;order := &amp;lt;-validOrderCh&lt;br&gt;prints valid order&lt;br&gt;wg.Done()" vertex="1">
+          <mxGeometry height="170" width="390" x="468" y="765" as="geometry" />
+        </mxCell>
+        <mxCell id="printer_invalid" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFE4EC;strokeColor=#C96385;strokeWidth=2;fontSize=15;align=left;spacing=12;" value="&lt;b&gt;invalid printer goroutine&lt;/b&gt;&lt;br&gt;invalid := &amp;lt;-invalidOrderCh&lt;br&gt;prints order + error&lt;br&gt;wg.Done()" vertex="1">
+          <mxGeometry height="170" width="425" x="883" y="765" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="main" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1D4F7A;strokeWidth=2.5;endArrow=classic;endFill=1;fontSize=13;fontColor=#1D4F7A;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.336;entryY=1.012;entryDx=0;entryDy=0;entryPerimeter=0;" target="receive" value="Step 1: go receiveOrders">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="380" />
+              <mxPoint x="551" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="main" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1D4F7A;strokeWidth=2.5;endArrow=classic;endFill=1;fontSize=13;fontColor=#1D4F7A;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="validate" value="Step 2: go validateOrders">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="100" />
+              <mxPoint x="1338" y="100" />
+            </Array>
+            <mxPoint x="1520" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="receive" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1D4F7A;strokeWidth=2.5;endArrow=classic;endFill=1;fontSize=13;fontColor=#1D4F7A;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="ch_received" value="Step 3: send parsed order">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="943.090909090909" y="340" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="ch_received" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1D4F7A;strokeWidth=2.5;endArrow=classic;endFill=1;fontSize=13;fontColor=#1D4F7A;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="validate" value="Step 4: read one order">
+          <mxGeometry relative="1" x="0.0585" as="geometry">
+            <mxPoint y="-1" as="offset" />
+            <Array as="points">
+              <mxPoint x="725" y="490" />
+              <mxPoint x="840" y="490" />
+              <mxPoint x="840" y="245" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="validate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E8B57;strokeWidth=2.8;endArrow=classic;endFill=1;fontSize=13;fontColor=#2E8B57;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ch_valid" value="Step 5 valid">
+          <mxGeometry relative="1" x="0.219" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="980" y="350" />
+              <mxPoint x="980" y="580" />
+              <mxPoint x="673" y="580" />
+            </Array>
+            <mxPoint x="1323" y="370" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="validate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#B84B6A;strokeWidth=2.8;endArrow=classic;endFill=1;fontSize=13;fontColor=#B84B6A;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="ch_invalid" value="Step 6 invalid">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1085" y="620" />
+            </Array>
+            <mxPoint x="1070" y="370" as="sourcePoint" />
+            <mxPoint x="1190" y="590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="ch_valid" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E8B57;strokeWidth=2.8;endArrow=classic;endFill=1;fontSize=13;fontColor=#2E8B57;" target="printer_valid" value="printer receives">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="ch_invalid" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#B84B6A;strokeWidth=2.8;endArrow=classic;endFill=1;fontSize=13;fontColor=#B84B6A;" target="printer_invalid" value="printer receives">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFF4D6;strokeColor=#D0AB44;strokeWidth=1.5;fontSize=14;align=left;spacing=10;" value="Blue arrows = setup and handoff. Green = valid path. Pink = invalid path.&#xa;validateOrders reads one order only." vertex="1">
+          <mxGeometry height="80" width="1270" x="40" y="985" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
