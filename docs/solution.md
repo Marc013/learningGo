@@ -2,6 +2,8 @@
 
 This branch demonstrates a small Go concurrency pipeline with goroutines and channels.
 
+[Runtime flow in HTML][1]
+
 ## Source
 
 - Main program: [src/demo/main.go](../src/demo/main.go)
@@ -16,16 +18,16 @@ This branch demonstrates a small Go concurrency pipeline with goroutines and cha
 ## Current Program Flow (Branch-Accurate)
 
 1. main creates three channels:
-	- receivedOrdersCh (order)
-	- validOrderCh (order)
-	- invalidOrderCh (invalidOrder)
+   - receivedOrdersCh (order)
+   - validOrderCh (order)
+   - invalidOrderCh (invalidOrder)
 2. main starts two worker goroutines:
-	- receiveOrders(receivedOrdersCh)
-	- validateOrders(receivedOrdersCh, validOrderCh, invalidOrderCh)
+   - receiveOrders(receivedOrdersCh)
+   - validateOrders(receivedOrdersCh, validOrderCh, invalidOrderCh)
 3. receiveOrders loops through rawOrders, unmarshals JSON, and sends each parsed order into receivedOrdersCh.
 4. validateOrders reads exactly one order from receivedOrdersCh and routes it:
-	- Quantity <= 0 goes to invalidOrderCh
-	- Quantity > 0 goes to validOrderCh
+   - Quantity <= 0 goes to invalidOrderCh
+   - Quantity > 0 goes to validOrderCh
 5. Two printer goroutines wait on validOrderCh and invalidOrderCh. Only one receives a value in this version.
 6. main waits with a WaitGroup and exits after the routed order is printed.
 
@@ -38,3 +40,5 @@ This branch demonstrates a small Go concurrency pipeline with goroutines and cha
   Valid order received: ProductCode: 1111, Quantity: 5, Status: new
 
 If you change the first order quantity from 5 to -5, the invalid path is taken instead.
+
+[1]: https://rawcdn.githack.com/Marc013/learningGo/494c70c1cf861bb02c086cd104e53ae24f1ba7ca/docs/media/goroutine-channel-flow.html
