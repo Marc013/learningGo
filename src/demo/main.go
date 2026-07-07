@@ -54,8 +54,8 @@ func receiveOrders(out chan order) {
 }
 
 var rawOrders = []string{
-	`{"ProductCode": 1111, "Quantity": 5, "Status": 1}`, // to make this fail, change "5" to "-5"
-	`{"ProductCode": 2222, "Quantity": 42.3, "Status": 1}`,
-	`{"ProductCode": 3333, "Quantity": 19, "Status": 1}`,
-	`{"ProductCode": 4444, "Quantity": 8, "Status": 1}`,
+	`{"productCode": 1111, "quantity": 5, "status": 1}`, // to make this fail, change "5" to "-5"
+	`{"productCode": 2222, "quantity": 42.3, "status": 1}`,
+	`{"productCode": 3333, "quantity": 19, "status": 1}`,
+	`{"productCode": 4444, "quantity": 8, "status": 1}`,
 }
